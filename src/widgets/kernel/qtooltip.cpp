@@ -148,17 +148,17 @@ protected:
     void resizeEvent(QResizeEvent *e) override;
 
 #ifndef QT_NO_STYLE_STYLESHEET
-public slots:
+//public slots:
     /** \internal
       Cleanup the _q_stylesheet_parent propery.
      */
-    void styleSheetParentDestroyed() {
-        setProperty("_q_stylesheet_parent", QVariant());
-        styleSheetParent = nullptr;
-    }
+    //void styleSheetParentDestroyed() {
+      //  setProperty("_q_stylesheet_parent", QVariant());
+        //styleSheetParent = nullptr;
+    //}
 
-private:
-    QWidget *styleSheetParent;
+//private:
+    //QWidget *styleSheetParent;
 #endif
 
 private:
@@ -169,11 +169,11 @@ private:
 QTipLabel *QTipLabel::instance = nullptr;
 
 QTipLabel::QTipLabel(const QString &text, const QPoint &pos, QWidget *w, int msecDisplayTime)
-#ifndef QT_NO_STYLE_STYLESHEET
-    : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), styleSheetParent(nullptr), widget(nullptr)
-#else
+//#ifndef QT_NO_STYLE_STYLESHEET
+   // : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), styleSheetParent(nullptr), widget(nullptr)
+//#else
     : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(0)
-#endif
+//#endif
 {
     delete instance;
     instance = this;
@@ -526,19 +526,19 @@ QT_WARNING_POP
 #endif
         QTipLabel::instance->setTipRect(w, rect);
         QTipLabel::instance->placeTip(pos, w);
-        QTipLabel::instance->setObjectName(QLatin1String("qtooltip_label"));
+      //  QTipLabel::instance->setObjectName(QLatin1String("qtooltip_label"));
 
 
-#if QT_CONFIG(effects)
-        if (QApplication::isEffectEnabled(Qt::UI_FadeTooltip))
-            qFadeEffect(QTipLabel::instance);
-        else if (QApplication::isEffectEnabled(Qt::UI_AnimateTooltip))
-            qScrollEffect(QTipLabel::instance);
-        else
-            QTipLabel::instance->showNormal();
-#else
+//#if QT_CONFIG(effects)
+  //      if (QApplication::isEffectEnabled(Qt::UI_FadeTooltip))
+         //   qFadeEffect(QTipLabel::instance);
+       // else if (QApplication::isEffectEnabled(Qt::UI_AnimateTooltip))
+       //     qScrollEffect(QTipLabel::instance);
+       // else
+           // QTipLabel::instance->showNormal();
+////#else
         QTipLabel::instance->showNormal();
-#endif
+//#endif
     }
 }
 
