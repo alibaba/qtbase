@@ -258,11 +258,11 @@ void  QTipLabel::updateSize(const QPoint &pos)
 
 void QTipLabel::paintEvent(QPaintEvent *ev)
 {
-    QStylePainter p(this);
-    QStyleOptionFrame opt;
-    opt.init(this);
-    p.drawPrimitive(QStyle::PE_PanelTipLabel, opt);
-    p.end();
+   // QStylePainter p(this);
+   // QStyleOptionFrame opt;
+   // opt.init(this);
+   // p.drawPrimitive(QStyle::PE_PanelTipLabel, opt);
+   // p.end();
 
     QLabel::paintEvent(ev);
 }
