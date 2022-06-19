@@ -148,17 +148,17 @@ protected:
     void resizeEvent(QResizeEvent *e) override;
 
 #ifndef QT_NO_STYLE_STYLESHEET
-//public slots:
+public slots:
     /** \internal
       Cleanup the _q_stylesheet_parent propery.
      */
-    //void styleSheetParentDestroyed() {
-      //  setProperty("_q_stylesheet_parent", QVariant());
-        //styleSheetParent = nullptr;
-    //}
+    void styleSheetParentDestroyed() {
+        setProperty("_q_stylesheet_parent", QVariant());
+        styleSheetParent = nullptr;
+    }
 
-//private:
-    //QWidget *styleSheetParent;
+private:
+    QWidget *styleSheetParent;
 #endif
 
 private:
@@ -169,11 +169,11 @@ private:
 QTipLabel *QTipLabel::instance = nullptr;
 
 QTipLabel::QTipLabel(const QString &text, const QPoint &pos, QWidget *w, int msecDisplayTime)
-//#ifndef QT_NO_STYLE_STYLESHEET
-   // : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), styleSheetParent(nullptr), widget(nullptr)
-//#else
+#ifndef QT_NO_STYLE_STYLESHEET
+    : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), styleSheetParent(nullptr), widget(nullptr)
+#else
     : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(0)
-//#endif
+#endif
 {
     delete instance;
     instance = this;
@@ -214,13 +214,13 @@ void QTipLabel::restartExpireTimer(int msecDisplayTime)
 
 void QTipLabel::reuseTip(const QString &text, int msecDisplayTime, const QPoint &pos)
 {
-    //#ifndef QT_NO_STYLE_STYLESHEET
-    //    if (styleSheetParent){
-    //        disconnect(styleSheetParent, SIGNAL(destroyed()),
-    //                   QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
-    //        styleSheetParent = 0;
-    //    }
-    //#endif
+#ifndef QT_NO_STYLE_STYLESHEET
+    if (styleSheetParent){
+        disconnect(styleSheetParent, SIGNAL(destroyed()),
+                   QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
+        styleSheetParent = nullptr;
+    }
+#endif
 
     setText(text);
     updateSize(pos);
@@ -258,11 +258,11 @@ void  QTipLabel::updateSize(const QPoint &pos)
 
 void QTipLabel::paintEvent(QPaintEvent *ev)
 {
-   // QStylePainter p(this);
-   // QStyleOptionFrame opt;
-   // opt.init(this);
-   // p.drawPrimitive(QStyle::PE_PanelTipLabel, opt);
-   // p.end();
+    QStylePainter p(this);
+    QStyleOptionFrame opt;
+    opt.init(this);
+    p.drawPrimitive(QStyle::PE_PanelTipLabel, opt);
+    p.end();
 
     QLabel::paintEvent(ev);
 }
@@ -393,24 +393,24 @@ int QTipLabel::getTipScreen(const QPoint &pos, QWidget *w)
 
 void QTipLabel::placeTip(const QPoint &pos, QWidget *w)
 {
-//#ifndef QT_NO_STYLE_STYLESHEET
- //   if (testAttribute(Qt::WA_StyleSheet) || (w && qt_styleSheet(w->style()))) {
+#ifndef QT_NO_STYLE_STYLESHEET
+    if (testAttribute(Qt::WA_StyleSheet) || (w && qt_styleSheet(w->style()))) {
         //the stylesheet need to know the real parent
-     //   QTipLabel::instance->setProperty("_q_stylesheet_parent", QVariant::fromValue(w));
+        QTipLabel::instance->setProperty("_q_stylesheet_parent", QVariant::fromValue(w));
         //we force the style to be the QStyleSheetStyle, and force to clear the cache as well.
-    //    QTipLabel::instance->setStyleSheet(QLatin1String("/* */"));
+        QTipLabel::instance->setStyleSheet(QLatin1String("/* */"));
 
         // Set up for cleaning up this later...
-    //    QTipLabel::instance->styleSheetParent = w;
-     //   if (w) {
-       //     connect(w, SIGNAL(destroyed()),
-       //         QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
+        QTipLabel::instance->styleSheetParent = w;
+        if (w) {
+            connect(w, SIGNAL(destroyed()),
+                QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
             // QTBUG-64550: A font inherited by the style sheet might change the size,
             // particular on Windows, where the tip is not parented on a window.
-        //    QTipLabel::instance->updateSize(pos);
-       // }
-   // }
-//#endif //QT_NO_STYLE_STYLESHEET
+            QTipLabel::instance->updateSize(pos);
+        }
+    }
+#endif //QT_NO_STYLE_STYLESHEET
 
     QPoint p = pos;
     const QScreen *screen = QGuiApplication::screens().value(getTipScreen(pos, w),
@@ -526,19 +526,19 @@ QT_WARNING_POP
 #endif
         QTipLabel::instance->setTipRect(w, rect);
         QTipLabel::instance->placeTip(pos, w);
-      //  QTipLabel::instance->setObjectName(QLatin1String("qtooltip_label"));
+        QTipLabel::instance->setObjectName(QLatin1String("qtooltip_label"));
 
 
-//#if QT_CONFIG(effects)
-  //      if (QApplication::isEffectEnabled(Qt::UI_FadeTooltip))
-         //   qFadeEffect(QTipLabel::instance);
-       // else if (QApplication::isEffectEnabled(Qt::UI_AnimateTooltip))
-       //     qScrollEffect(QTipLabel::instance);
-       // else
-           // QTipLabel::instance->showNormal();
-////#else
+#if QT_CONFIG(effects)
+        if (QApplication::isEffectEnabled(Qt::UI_FadeTooltip))
+            qFadeEffect(QTipLabel::instance);
+        else if (QApplication::isEffectEnabled(Qt::UI_AnimateTooltip))
+            qScrollEffect(QTipLabel::instance);
+        else
+            QTipLabel::instance->showNormal();
+#else
         QTipLabel::instance->showNormal();
-//#endif
+#endif
     }
 }
 
