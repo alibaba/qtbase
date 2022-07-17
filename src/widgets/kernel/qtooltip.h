@@ -48,10 +48,27 @@ QT_BEGIN_NAMESPACE
 
 #ifndef QT_NO_TOOLTIP
 
+class QCustomizeTooltipDelegate
+{
+public:
+    virtual void showText(const QPoint &pos, const QString &text, QWidget *w, const QRect &rect,
+                          int msecShowTime) = 0;
+    virtual bool isVisible() = 0;
+    virtual QString text() = 0;
+    virtual QPalette palette() = 0;
+    virtual void setPalette(const QPalette &) = 0;
+    virtual QFont font() = 0;
+    virtual void setFont(const QFont &) = 0;
+};
+
+
 class Q_WIDGETS_EXPORT QToolTip
 {
     QToolTip() = delete;
 public:
+    static void initCustomizeTooltipDelegate(QCustomizeTooltipDelegate *customizeTooltipDelegate);
+
+    static void uninitCustomizeTooltipDelegate();
     // ### Qt 6 - merge the three showText functions below
     static void showText(const QPoint &pos, const QString &text, QWidget *w = nullptr);
     static void showText(const QPoint &pos, const QString &text, QWidget *w, const QRect &rect);
