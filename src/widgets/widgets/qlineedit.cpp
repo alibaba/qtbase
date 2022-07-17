@@ -52,6 +52,7 @@
 #include "qstylehints.h"
 #if QT_CONFIG(menu)
 #include "qmenu.h"
+#include "qcustommenu.h"
 #endif
 #include "qpainter.h"
 #include "qpixmap.h"
@@ -2201,7 +2202,7 @@ static inline void setActionIcon(QAction *action, const QString &name)
 QMenu *QLineEdit::createStandardContextMenu()
 {
     Q_D(QLineEdit);
-    QMenu *popup = new QMenu(this);
+    QMenu *popup = new QCustomMenu(this);
     popup->setObjectName(QLatin1String("qt_edit_menu"));
     QAction *action = nullptr;
 
@@ -2216,7 +2217,7 @@ QMenu *QLineEdit::createStandardContextMenu()
         setActionIcon(action, QStringLiteral("edit-redo"));
         connect(action, SIGNAL(triggered()), SLOT(redo()));
 
-        popup->addSeparator();
+        //popup->addSeparator();
     }
 
 #ifndef QT_NO_CLIPBOARD
@@ -2249,8 +2250,8 @@ QMenu *QLineEdit::createStandardContextMenu()
         connect(action, SIGNAL(triggered()), d->control, SLOT(_q_deleteSelected()));
     }
 
-    if (!popup->isEmpty())
-        popup->addSeparator();
+    //if (!popup->isEmpty())
+      //  popup->addSeparator();
 
     action = popup->addAction(QLineEdit::tr("Select All") + ACCEL_KEY(QKeySequence::SelectAll));
     action->setEnabled(!d->control->text().isEmpty() && !d->control->allSelected());
@@ -2259,7 +2260,7 @@ QMenu *QLineEdit::createStandardContextMenu()
     connect(action, SIGNAL(triggered()), SLOT(selectAll()));
 
     if (!d->control->isReadOnly() && QGuiApplication::styleHints()->useRtlExtensions()) {
-        popup->addSeparator();
+       // popup->addSeparator();
         QUnicodeControlCharacterMenu *ctrlCharacterMenu = new QUnicodeControlCharacterMenu(this, popup);
         popup->addMenu(ctrlCharacterMenu);
     }

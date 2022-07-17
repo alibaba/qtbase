@@ -52,6 +52,7 @@
 #include <qclipboard.h>
 #if QT_CONFIG(menu)
 #include <qmenu.h>
+#include "qcustommenu.h"
 #endif
 #include <qstyle.h>
 #include <qtimer.h>
@@ -2316,7 +2317,7 @@ QMenu *QWidgetTextControl::createStandardContextMenu(const QPointF &pos, QWidget
     if (d->linkToCopy.isEmpty() && !showTextSelectionActions)
         return nullptr;
 
-    QMenu *menu = new QMenu(parent);
+    QMenu *menu = new QCustomMenu(parent);
     QAction *a;
 
     if (d->interactionFlags & Qt::TextEditable) {
@@ -2328,7 +2329,7 @@ QMenu *QWidgetTextControl::createStandardContextMenu(const QPointF &pos, QWidget
         a->setEnabled(d->doc->isRedoAvailable());
         a->setObjectName(QStringLiteral("edit-redo"));
         setActionIcon(a, QStringLiteral("edit-redo"));
-        menu->addSeparator();
+        //menu->addSeparator();
 
 #ifndef QT_NO_CLIPBOARD
         a = menu->addAction(tr("Cu&t") + ACCEL_KEY(QKeySequence::Cut), this, SLOT(cut()));
@@ -2370,7 +2371,7 @@ QMenu *QWidgetTextControl::createStandardContextMenu(const QPointF &pos, QWidget
 
 
     if (showTextSelectionActions) {
-        menu->addSeparator();
+        //menu->addSeparator();
         a = menu->addAction(tr("Select All") + ACCEL_KEY(QKeySequence::SelectAll), this, SLOT(selectAll()));
         a->setEnabled(!d->doc->isEmpty());
         a->setObjectName(QStringLiteral("select-all"));
@@ -2378,7 +2379,7 @@ QMenu *QWidgetTextControl::createStandardContextMenu(const QPointF &pos, QWidget
     }
 
     if ((d->interactionFlags & Qt::TextEditable) && QGuiApplication::styleHints()->useRtlExtensions()) {
-        menu->addSeparator();
+        //menu->addSeparator();
         QUnicodeControlCharacterMenu *ctrlCharacterMenu = new QUnicodeControlCharacterMenu(this, menu);
         menu->addMenu(ctrlCharacterMenu);
     }
