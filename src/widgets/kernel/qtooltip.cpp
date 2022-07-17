@@ -451,13 +451,13 @@ bool QTipLabel::tipChanged(const QPoint &pos, const QString &text, QObject *o)
        return false;
 }
 
-void QT_NAMESPACE::QToolTip::initCustomizeTooltipDelegate(
+void QToolTip::initCustomizeTooltipDelegate(
         QCustomizeTooltipDelegate *customizeTooltipDelegate)
 {
     g_customizeTooltipDelegate = customizeTooltipDelegate;
 }
 
-void QT_NAMESPACE::QToolTip::uninitCustomizeTooltipDelegate() 
+void QToolTip::uninitCustomizeTooltipDelegate() 
 {
     g_customizeTooltipDelegate = nullptr;
 }
@@ -632,7 +632,7 @@ QPalette QToolTip::palette()
 QFont QToolTip::font()
 {
     if (g_customizeTooltipDelegate) {
-        return g_customizeTooltipDelegate->palette();
+        return g_customizeTooltipDelegate->font();
     }
 
     return QApplication::font("QTipLabel");

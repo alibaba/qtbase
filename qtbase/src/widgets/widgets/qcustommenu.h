@@ -39,7 +39,9 @@
 
 #ifndef QCUSTOMMENU_H
 #define QCUSTOMMENU_H
-
+#include <QtCore/qmath.h>
+#include <QtGui/qpainterpath.h>
+#include <QtGui/qpainter.h>
 #include "qmenu.h"
 
 QT_BEGIN_NAMESPACE
@@ -67,7 +69,7 @@ public:
     }
 
 protected:
-    void paintEvent(QPaintEvent *) override
+    void paintEvent(QPaintEvent *event) override
     {
         int nShadowsWidth = 10; 
         int nRadius = 10; 
