@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 **
 ** Copyright (C) 2016 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
@@ -61,7 +61,7 @@ public:
                 "margin: 8px;"
                 "padding-left: 8px; padding-right: 8px; padding-top: 8px; padding-bottom: 8px;");
         setCursor(Qt::PointingHandCursor);
-        setMinimumWidth(100);
+        //setMinimumWidth(100);
     }
     ~QCustomMenu()
     {
