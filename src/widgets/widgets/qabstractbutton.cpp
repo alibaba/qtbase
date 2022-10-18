@@ -504,6 +504,7 @@ QAbstractButton::QAbstractButton(QWidget *parent)
 {
     Q_D(QAbstractButton);
     d->init();
+    setCursor(Qt::PointingHandCursor);
 }
 
 /*!
@@ -526,6 +527,7 @@ QAbstractButton::QAbstractButton(QAbstractButtonPrivate &dd, QWidget *parent)
 {
     Q_D(QAbstractButton);
     d->init();
+    setCursor(Qt::PointingHandCursor);
 }
 
 /*!

@@ -29,7 +29,7 @@ QT_BREAKPAD_ROOT_PATH = $$(QT_BREAKPAD_ROOT_PATH)
     CONFIG -= no_debug_info separate_debug_info
 }
 
-force_debug_info|debug: \
+force_debug_info|debug|release: \
     CONFIG += debug_info
 
 force_debug_info {
