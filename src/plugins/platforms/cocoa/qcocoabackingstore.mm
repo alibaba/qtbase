@@ -680,8 +680,8 @@ void QCALayerBackingStore::backingPropertiesChanged()
 
     qCDebug(lcQpaBackingStore) << "Updating color space of existing buffers";
     for (auto &buffer : m_buffers) {
-        if (buffer)
-            buffer->setColorSpace(colorSpace());
+        //if (buffer)
+           // buffer->setColorSpace(colorSpace());
     }
 }
 
@@ -763,7 +763,7 @@ QCALayerBackingStore::GraphicsBuffer::GraphicsBuffer(const QSize &size, qreal de
     , dirtyRegion(0, 0, size.width() / devicePixelRatio, size.height() / devicePixelRatio)
     , m_devicePixelRatio(devicePixelRatio)
 {
-    setColorSpace(colorSpace);
+    //setColorSpace(colorSpace);
 }
 
 QImage *QCALayerBackingStore::GraphicsBuffer::asImage()
