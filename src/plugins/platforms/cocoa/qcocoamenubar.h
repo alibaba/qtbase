@@ -67,7 +67,7 @@ public:
         { return m_nativeMenu; }
 
     static void updateMenuBarImmediately();
-
+    static void insertWindowMenu();
     QList<QCocoaMenuItem*> merged() const;
     NSMenuItem *itemForRole(QPlatformMenuItem::MenuRole role);
     QCocoaWindow *cocoaWindow() const;

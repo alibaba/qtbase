@@ -51,7 +51,7 @@ public:
     QIOSurfaceGraphicsBuffer(const QSize &size, const QPixelFormat &format);
     ~QIOSurfaceGraphicsBuffer();
 
-    void setColorSpace(QCFType<CGColorSpaceRef> colorSpace);
+    //void setColorSpace(QCFType<CGColorSpaceRef> colorSpace);
 
     const uchar *data() const override;
     uchar *data() override;

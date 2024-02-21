@@ -86,7 +86,7 @@ QIOSurfaceGraphicsBuffer::QIOSurfaceGraphicsBuffer(const QSize &size, const QPix
 QIOSurfaceGraphicsBuffer::~QIOSurfaceGraphicsBuffer()
 {
 }
-
+/*
 void QIOSurfaceGraphicsBuffer::setColorSpace(QCFType<CGColorSpaceRef> colorSpace)
 {
     static const auto kIOSurfaceColorSpace = CFSTR("IOSurfaceColorSpace");
@@ -100,6 +100,7 @@ void QIOSurfaceGraphicsBuffer::setColorSpace(QCFType<CGColorSpaceRef> colorSpace
         IOSurfaceRemoveValue(m_surface, kIOSurfaceColorSpace);
     }
 }
+*/
 
 const uchar *QIOSurfaceGraphicsBuffer::data() const
 {

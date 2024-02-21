@@ -115,6 +115,8 @@ QT_BEGIN_NAMESPACE
     \sa QWidget::toolTip, QAction::toolTip, {Tool Tips Example}
 */
 
+static QCustomizeTooltipDelegate *g_customizeTooltipDelegate = nullptr;
+
 class QTipLabel : public QLabel
 {
     Q_OBJECT
@@ -183,22 +185,11 @@ QTipLabel::QTipLabel(const QString &text, const QPoint &pos, QWidget *w, int mse
     ensurePolished();
     setMargin(1 + style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth, nullptr, this));
     setFrameStyle(QFrame::NoFrame);
-    setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    setAlignment(Qt::AlignLeft);
     setIndent(1);
     qApp->installEventFilter(this);
     setWindowOpacity(style()->styleHint(QStyle::SH_ToolTipLabel_Opacity, nullptr, this) / 255.0);
     setMouseTracking(true);
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
-    setAttribute(Qt::WA_TranslucentBackground);
-    setStyleSheet("background-color: #FFFFFF;"
-        "border-radius: 6px;"
-        "margin: 6px;"
-        "padding-left: 6px; padding-right: 6px; padding-top: 6px; padding-bottom: 6px;");
-    QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
-    effect->setColor(QColor(0, 0, 0, 100));
-    effect->setOffset(0, 0);
-    effect->setBlurRadius(10);
-    setGraphicsEffect(effect);
     fadingOut = false;
     reuseTip(text, msecDisplayTime, pos);
 }
@@ -214,13 +205,13 @@ void QTipLabel::restartExpireTimer(int msecDisplayTime)
 
 void QTipLabel::reuseTip(const QString &text, int msecDisplayTime, const QPoint &pos)
 {
-    //#ifndef QT_NO_STYLE_STYLESHEET
-    //    if (styleSheetParent){
-    //        disconnect(styleSheetParent, SIGNAL(destroyed()),
-    //                   QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
-    //        styleSheetParent = 0;
-    //    }
-    //#endif
+#ifndef QT_NO_STYLE_STYLESHEET
+    if (styleSheetParent){
+        disconnect(styleSheetParent, SIGNAL(destroyed()),
+                   QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
+        styleSheetParent = nullptr;
+    }
+#endif
 
     setText(text);
     updateSize(pos);
@@ -393,24 +384,24 @@ int QTipLabel::getTipScreen(const QPoint &pos, QWidget *w)
 
 void QTipLabel::placeTip(const QPoint &pos, QWidget *w)
 {
-//#ifndef QT_NO_STYLE_STYLESHEET
- //   if (testAttribute(Qt::WA_StyleSheet) || (w && qt_styleSheet(w->style()))) {
+#ifndef QT_NO_STYLE_STYLESHEET
+    if (testAttribute(Qt::WA_StyleSheet) || (w && qt_styleSheet(w->style()))) {
         //the stylesheet need to know the real parent
-     //   QTipLabel::instance->setProperty("_q_stylesheet_parent", QVariant::fromValue(w));
+        QTipLabel::instance->setProperty("_q_stylesheet_parent", QVariant::fromValue(w));
         //we force the style to be the QStyleSheetStyle, and force to clear the cache as well.
-    //    QTipLabel::instance->setStyleSheet(QLatin1String("/* */"));
+        QTipLabel::instance->setStyleSheet(QLatin1String("/* */"));
 
         // Set up for cleaning up this later...
-    //    QTipLabel::instance->styleSheetParent = w;
-     //   if (w) {
-       //     connect(w, SIGNAL(destroyed()),
-       //         QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
+        QTipLabel::instance->styleSheetParent = w;
+        if (w) {
+            connect(w, SIGNAL(destroyed()),
+                QTipLabel::instance, SLOT(styleSheetParentDestroyed()));
             // QTBUG-64550: A font inherited by the style sheet might change the size,
             // particular on Windows, where the tip is not parented on a window.
-        //    QTipLabel::instance->updateSize(pos);
-       // }
-   // }
-//#endif //QT_NO_STYLE_STYLESHEET
+            QTipLabel::instance->updateSize(pos);
+        }
+    }
+#endif //QT_NO_STYLE_STYLESHEET
 
     QPoint p = pos;
     const QScreen *screen = QGuiApplication::screens().value(getTipScreen(pos, w),
@@ -460,6 +451,17 @@ bool QTipLabel::tipChanged(const QPoint &pos, const QString &text, QObject *o)
        return false;
 }
 
+void QToolTip::initCustomizeTooltipDelegate(
+        QCustomizeTooltipDelegate *customizeTooltipDelegate)
+{
+    g_customizeTooltipDelegate = customizeTooltipDelegate;
+}
+
+void QToolTip::uninitCustomizeTooltipDelegate() 
+{
+    g_customizeTooltipDelegate = nullptr;
+}
+
 /*!
     Shows \a text as a tool tip, with the global position \a pos as
     the point of interest. The tool tip will be shown with a platform
@@ -493,6 +495,12 @@ void QToolTip::showText(const QPoint &pos, const QString &text, QWidget *w, cons
 
 void QToolTip::showText(const QPoint &pos, const QString &text, QWidget *w, const QRect &rect, int msecDisplayTime)
 {
+    if (g_customizeTooltipDelegate)
+    {
+        g_customizeTooltipDelegate->showText(pos, text, w, rect, msecDisplayTime);
+        return;
+    }
+
     if (QTipLabel::instance && QTipLabel::instance->isVisible()){ // a tip does already exist
         if (text.isEmpty()){ // empty text means hide current tip
             QTipLabel::instance->hideTip();
@@ -574,6 +582,10 @@ void QToolTip::showText(const QPoint &pos, const QString &text, QWidget *w)
  */
 bool QToolTip::isVisible()
 {
+    if (g_customizeTooltipDelegate) {
+        return g_customizeTooltipDelegate->isVisible();
+    }
+
     return (QTipLabel::instance != nullptr && QTipLabel::instance->isVisible());
 }
 
@@ -585,6 +597,10 @@ bool QToolTip::isVisible()
  */
 QString QToolTip::text()
 {
+    if (g_customizeTooltipDelegate) {
+        return g_customizeTooltipDelegate->text();
+    }
+
     if (QTipLabel::instance)
         return QTipLabel::instance->text();
     return QString();
@@ -601,6 +617,10 @@ Q_GLOBAL_STATIC(QPalette, tooltip_palette)
 */
 QPalette QToolTip::palette()
 {
+    if (g_customizeTooltipDelegate) {
+        return g_customizeTooltipDelegate->palette();
+    }
+
     return *tooltip_palette();
 }
 
@@ -611,6 +631,10 @@ QPalette QToolTip::palette()
 */
 QFont QToolTip::font()
 {
+    if (g_customizeTooltipDelegate) {
+        return g_customizeTooltipDelegate->font();
+    }
+
     return QApplication::font("QTipLabel");
 }
 
@@ -624,6 +648,11 @@ QFont QToolTip::font()
 */
 void QToolTip::setPalette(const QPalette &palette)
 {
+    if (g_customizeTooltipDelegate) {
+        g_customizeTooltipDelegate->setPalette(palette);
+        return;
+    }
+
     *tooltip_palette() = palette;
     if (QTipLabel::instance)
         QTipLabel::instance->setPalette(palette);
@@ -636,6 +665,11 @@ void QToolTip::setPalette(const QPalette &palette)
 */
 void QToolTip::setFont(const QFont &font)
 {
+    if (g_customizeTooltipDelegate) {
+        g_customizeTooltipDelegate->setFont(font);
+        return;
+    }
+
     QApplication::setFont(font, "QTipLabel");
 }
 
